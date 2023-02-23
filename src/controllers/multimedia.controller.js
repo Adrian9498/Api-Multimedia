@@ -7,11 +7,14 @@ export const getMultimedia = async (req,res) =>{
     let response;
     try {
         response = await models.multimedias.findAll({
-            include:{
+            include:[{
                 model: models.audios,
                 as: 'audios',
                 include: 'songs'
-            }
+            },{
+                model: models.creators,
+                as : 'creator'
+            }]
         })
     } catch (e) {
         res.status(500).json({"error": e.message})
@@ -55,8 +58,9 @@ const addAudio = async (cuerpo,modelo) =>{
     let audio_id;
     let {name,last_name,age,bio} = cuerpo.creator;
     let modelo_name = modelo.name
+    
     try {
-        validation = await models.publishers.findAll({
+        validation = await models.publishers.findAll({ // Modelo,parametros de busqueda
             where: {"name": cuerpo.publisher}
         })
         
@@ -128,27 +132,26 @@ const addAudio = async (cuerpo,modelo) =>{
 
         audio_id = response.dataValues.id_audio;
 
-        let json_aux;
         
-        if(modelo_name == "songs"){
-            json_aux = {
+        let selector ={
+            "songs":{
                 "duration":cuerpo.duration,
                 "audio_id":audio_id
-            }
-        }else if(modelo_name == "podcasts"){
-            json_aux = {
-
+            },
+            "podcasts":{
                 "duration_p_e":cuerpo.duration_p_e,
                 "noepisodes":cuerpo.noepisodes,
                 "audio_id":audio_id
-            }
-        }else if(modelo_name == "audio_books"){
-            json_aux = {
+            },
+            "audio_books":{
                 "duration":cuerpo.duration,
                 "chapters":cuerpo.chapters,
                 "audio_id":audio_id
             }
         }
+        
+        let json_aux = selector[modelo_name]
+        
         response = await modelo.create(json_aux)
 
         return {"Estatus":"Registro exitoso"};
@@ -158,3 +161,33 @@ const addAudio = async (cuerpo,modelo) =>{
         return {"error": e.message}
     } 
 };
+
+// modelo -> modelos de la base --- params -> {"name":Natalia,"last_name"Lafourcade}
+const validations = async (modelo,w_params,creationOBJ) => {
+
+    let id_return;
+    let model_name = modelo.name;
+    let selector;
+    let validation = await modelo.findAll({
+        where: w_params
+    });
+
+    if(validation.length == 0){
+        response = await modelo.create(creationOBJ)
+        selector ={
+            "publishers":response.dataValues.id_publisher,
+            "creators":response.dataValues.id_creator,
+            "tipo_archivo":response.dataValues.id_tipo_archivo
+        }
+        id_return = selector[model_name]
+    }else{
+        selector ={
+            "publishers":validation[0].dataValues.id_publisher,
+            "creators":validation[0].dataValues.id_creator,
+            "tipo_archivo":validation[0].dataValues.id_tipo_archivo,
+        }
+        id_return = selector[model_name]
+    }
+
+    return id_return;
+}

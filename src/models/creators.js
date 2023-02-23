@@ -25,6 +25,9 @@ export default class creators extends Model {
     bio: {
       type: DataTypes.STRING(255),
       allowNull: false
+    },
+    nickname: {
+      type: DataTypes.STRING,
     }
   }, {
     sequelize,

@@ -320,3 +320,23 @@ export const deleteTipoArchivo = async (req, res) => {
     }
     res.status(200).json({"Estado:": response})
 }
+
+export const getAudios = async (req, res) => {
+    console.log("Get Audios");
+    let response; 
+    try{
+        response = await models.audios.findAll({
+            include:[{
+                model: models.songs,
+                as: 'songs'
+            },{
+                model: models.multimedias,
+                as: 'multimedium'
+            }]
+        })
+    }
+    catch (e) {
+        res.status(500).json({"Error": e.message});
+    }
+    res.status(200).json(response);
+}

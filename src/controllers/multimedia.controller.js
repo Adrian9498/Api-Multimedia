@@ -3,6 +3,7 @@ import modelosInit from '../models/init-models.js'
 import {Op} from "sequelize";
 let models = modelosInit(sequelize)
 
+// Funcion Get All que obtiene toda la tabla Multimedias
 export const getMultimedia = async (req,res) =>{
     let response;
     try {
@@ -22,6 +23,7 @@ export const getMultimedia = async (req,res) =>{
     res.status(200).json(response);
 }
 
+// Funcion AddMultimedia que permite la insercion de multiples multimedias segun el tipo de cuerpo
 export const addMultimedia = async (req,res) =>{
     
     let cuerpo = req.body;
@@ -48,6 +50,7 @@ export const addMultimedia = async (req,res) =>{
     res.status(200).json(cuerpo);
 }
 
+// Funcion AddAudio que permite procesar las inserciones de Audio de AddMultimedia()
 const addAudio = async (cuerpo,modelo) =>{
     let response;
     let validation;
@@ -162,6 +165,7 @@ const addAudio = async (cuerpo,modelo) =>{
     } 
 };
 
+// Funcion Validations que permite procesar las validaciones de las inserciones
 // modelo -> modelos de la base --- params -> {"name":Natalia,"last_name"Lafourcade}
 const validations = async (modelo,w_params,creationOBJ) => {
 
@@ -190,4 +194,50 @@ const validations = async (modelo,w_params,creationOBJ) => {
     }
 
     return id_return;
+}
+
+// getCreators, getPublishers, getTipoArchivo, addCreator, addPublisher, addTipoArchivo, deleteCreator, deletePublisher, deleteTipoArchivo
+
+export const getCreators = async (req, res) => {
+    console.log("Get Creators");
+    let response; 
+    try{
+        response = await models.creators.findAll()
+    }
+    catch (e) {
+        res.status(500).json({"Error": e.message});
+    }
+    res.status(200).json(response);
+}
+
+export const getPublishers = async (req, res) => {
+    console.log("Get Publishers");
+}
+
+export const getTipoArchivo = async (req, res) => {
+    console.log("Get Tipo Archivo");
+}
+
+export const addCreator = async (req, res) => {
+    console.log("Add Creator");
+}
+
+export const addPublisher = async (req, res) => {
+    console.log("Add Publisher");
+}
+
+export const addTipoArchivo = async (req, res) => {
+    console.log("Add Tipo Archivo");
+}
+
+export const deleteCreator = async (req, res) => {
+    console.log("Delete Creator");
+}
+
+export const deletePublisher = async (req, res) => {
+    console.log("Delete Publisher");
+}
+
+export const deleteTipoArchivo = async (req, res) => {
+    console.log("Delete Tipo Archivo");
 }

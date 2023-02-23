@@ -17,7 +17,7 @@ router.post('/api/addCreator', addCreator)
 router.post('/api/addPublisher', addPublisher)
 router.post('/api/addTipoArchivo', addTipoArchivo)
 // Eliminaciones de: Creators, Publishers, Tipo_Archivo
-router.delete('/api/deleteCreator', deleteCreator)
-router.delete('/api/deletePublisher', deletePublisher)
-router.delete('/api/deleteTipoArchivo', deleteTipoArchivo)
+router.delete('/api/deleteCreator/:id_creator', deleteCreator)
+router.delete('/api/deletePublisher/:id_publisher', deletePublisher)
+router.delete('/api/deleteTipoArchivo/:id_tipoarchivo', deleteTipoArchivo)
 export default router;

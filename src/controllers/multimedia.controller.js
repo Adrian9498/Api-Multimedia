@@ -212,32 +212,111 @@ export const getCreators = async (req, res) => {
 
 export const getPublishers = async (req, res) => {
     console.log("Get Publishers");
+    let response; 
+    try{
+        response = await models.publishers.findAll()
+    }
+    catch (e) {
+        res.status(500).json({"Error": e.message});
+    }
+    res.status(200).json(response);
 }
 
 export const getTipoArchivo = async (req, res) => {
     console.log("Get Tipo Archivo");
+    let response; 
+    try{
+        response = await models.tipo_archivo.findAll()
+    }
+    catch (e) {
+        res.status(500).json({"Error": e.message});
+    }
+    res.status(200).json(response);
 }
 
 export const addCreator = async (req, res) => {
     console.log("Add Creator");
+    const {name, last_name, age, bio} = req.body;
+    let response;
+    try{
+        response = await models.creators.create({
+            name, 
+            last_name, 
+            age, 
+            bio
+        })
+    } catch (e) {
+        res.status(500).json({"Error": e.message});
+    }
+    res.status(200).json({"Registro Exitoso": response.dataValues})
 }
 
 export const addPublisher = async (req, res) => {
     console.log("Add Publisher");
+    const {name} = req.body;
+    let response;
+    try{
+        response = await models.publishers.create({
+            name
+        })
+    } catch (e) {
+        res.status(500).json({"Error": e.message});
+    }
+    res.status(200).json({"Registro Exitoso": response.dataValues})
 }
 
 export const addTipoArchivo = async (req, res) => {
     console.log("Add Tipo Archivo");
+    const {extension} = req.body;
+    let response;
+    try{
+        response = await models.tipo_archivo.create({
+            extension
+        })
+    } catch (e) {
+        res.status(500).json({"Error": e.message});
+    }
+    res.status(200).json({"Registro Exitoso": response.dataValues})
 }
 
 export const deleteCreator = async (req, res) => {
     console.log("Delete Creator");
+    const {id_creator} = req.params;
+    let response;
+    try {
+        response = await models.creators.destroy({
+            where:{id_creator}
+        })
+    } catch (e) {
+        res.status(500).json({"error": e.message})
+    }
+    res.status(200).json({"Estado:": response})
 }
 
 export const deletePublisher = async (req, res) => {
     console.log("Delete Publisher");
+    const {id_publisher} = req.params;
+    let response;
+    try {
+        response = await models.publishers.destroy({
+            where:{id_publisher}
+        })
+    } catch (e) {
+        res.status(500).json({"error": e.message})
+    }
+    res.status(200).json({"Estado:": response})
 }
 
 export const deleteTipoArchivo = async (req, res) => {
     console.log("Delete Tipo Archivo");
+    const {id_tipoarchivo} = req.params;
+    let response;
+    try {
+        response = await models.creators.destroy({
+            where:{id_tipoarchivo}
+        })
+    } catch (e) {
+        res.status(500).json({"error": e.message})
+    }
+    res.status(200).json({"Estado:": response})
 }

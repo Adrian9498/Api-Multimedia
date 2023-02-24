@@ -28,23 +28,64 @@ export const addMultimedia = async (req,res) =>{
     
     let cuerpo = req.body;
 
-    if('chapters'in cuerpo && !('noepisodes'in cuerpo)){
+    if('isColor' in cuerpo && !('ranking'in cuerpo)){
+        if('imagenes'in cuerpo && !('volumes'in cuerpo)){
+            let aux_res = await addAudio(cuerpo,models.books)
+            res.status(200).json(aux_res);
+            return;
+        }else if('volumes'in cuerpo && !('imagenes'in cuerpo)){
+            let aux_res = await addAudio(cuerpo,models.mangas)
+            res.status(200).json(aux_res);
+            return;
+        }else if(!('volumes'in cuerpo) && !('imagenes'in cuerpo)){
+            let aux_res = await addAudio(cuerpo,models.comics)
+            res.status(200).json(aux_res);
+            return;
+        }else{
+            res.status(500).json({"Error":"Tu peticion es invalida"});
+            return;
+        }
+    }else if('ranking' in cuerpo  && !('isColor'in cuerpo)){
+        if('isSequel'in cuerpo && !('volumes'in cuerpo)){
+            let aux_res = await addAudio(cuerpo,models.movie)
+            res.status(200).json(aux_res);
+            return;
+        }else if('seasons'in cuerpo && !('isSequel'in cuerpo)){
+            let aux_res = await addAudio(cuerpo,models.series)
+            res.status(200).json(aux_res);
+            return;
+        }else if(!('seasons'in cuerpo) && !('isSequel'in cuerpo)){
+            let aux_res = await addAudio(cuerpo,models.social_videos)
+            res.status(200).json(aux_res);
+            return;
+        }else{
+            res.status(500).json({"Error":"Tu peticion es invalida aqui"});
+            return;
+        }
+    }else if(!('isColor'in cuerpo) && !('ranking'in cuerpo) ){
         
-        let aux_res = await addAudio(cuerpo,models.audio_books)
-        res.status(200).json(aux_res);
-        return;
-    }else if('noepisodes'in cuerpo && !('chapters'in cuerpo)){
-        let aux_res = await addAudio(cuerpo,models.podcasts)
-        res.status(200).json(aux_res);
-        return;
-    }else if(!('noepisodes'in cuerpo) && !('chapters'in cuerpo)){
-        
-        let aux_res = await addAudio(cuerpo,models.songs)
-        res.status(200).json(aux_res);
-        return;
+        if('chapters'in cuerpo && !('noepisodes'in cuerpo)){
+            
+            let aux_res = await addAudio(cuerpo,models.audio_books)
+            res.status(200).json(aux_res);
+            return;
+        }else if('noepisodes'in cuerpo && !('chapters'in cuerpo)){
+            let aux_res = await addAudio(cuerpo,models.podcasts)
+            res.status(200).json(aux_res);
+            return;
+        }else if(!('noepisodes'in cuerpo) && !('chapters'in cuerpo)){
+            
+            let aux_res = await addAudio(cuerpo,models.songs)
+            res.status(200).json(aux_res);
+            return;
+        }else{
+            res.status(500).json({"Error":"Tu peticion es invalida"});
+            return;
+        }
+
     }else{
-        res.status(500).json({"Error":"Tu peticion es invalida"});
-        return;
+        res.status(500).json({"Error":"Tu peticion es invalida aca"});
+        return;  
     }
 
     res.status(200).json(cuerpo);
@@ -53,7 +94,6 @@ export const addMultimedia = async (req,res) =>{
 // Funcion AddAudio que permite procesar las inserciones de Audio de AddMultimedia()
 const addAudio = async (cuerpo,modelo) =>{
     let response;
-    let validation;
     let publisher_id;
     let creator_id;
     let multimedia_id;
@@ -63,80 +103,44 @@ const addAudio = async (cuerpo,modelo) =>{
     let modelo_name = modelo.name
     
     try {
-        validation = await models.publishers.findAll({ // Modelo,parametros de busqueda
-            where: {"name": cuerpo.publisher}
-        })
+
+        let w_publisher = {"name": cuerpo.publisher.trim()}
+        let w_creator = { "name":name, "last_name":last_name }
+        let objCreator = {"name":name.trim(),"last_name":last_name.trim(),"age":age,"bio":bio.trim()}
+        let w_tarchivo = {"extension":cuerpo.extension.trim()}
+
+        publisher_id = await validations(models.publishers,w_publisher,w_publisher)
         
-        if(validation.length == 0){
-            response = await models.publishers.create({
-                "name":cuerpo.publisher.trim()
-            })
+        creator_id = await validations(models.creators,w_creator,objCreator)
 
-            publisher_id = response.dataValues.id_publisher;
-        }else{
-            publisher_id = validation[0].dataValues.id_publisher;
-        }
-
-        
-        
-        validation = await models.creators.findAll({
-            where: {
-                "name":name,
-                "last_name":last_name
-            }
-        })
-
-        if(validation.length == 0){
-            response = await models.creators.create({
-                "name":name.trim(),
-                "last_name":last_name.trim(),
-                "age":age,
-                "bio":bio.trim()
-            })
-
-            creator_id = response.dataValues.id_creator;
-        }else{
-            creator_id = validation[0].dataValues.id_creator;
-        }
-
-        
-
-        response = await models.multimedias.create({
+        let objMultimedia = {
             "name": cuerpo.name,
             "lang": cuerpo.lang,
             "release_year": cuerpo.release_year,
             "description": cuerpo.description,
             "creator_id": creator_id,
             "publisher_id": publisher_id
-        })
+        }
+
+        
+        response = await models.multimedias.create(objMultimedia)
 
         multimedia_id =  response.dataValues.id_multimedia;
         
-        validation = await models.tipo_archivo.findAll({
-            where: {
-                "extension":cuerpo.extension,
-            }
-        })
+        tipo_archivo_id = await validations(models.tipo_archivo,w_tarchivo,w_tarchivo)
+
+
+        //aqui empieza creacion de audio
         
-        if(validation.length == 0){
-            response = await models.tipo_archivo.create({
-                "extension":cuerpo.extension.trim(),
-            })
+        //let objAudio = {"multimedia_id":multimedia_id,"tipo_archivo_id":tipo_archivo_id}
+        
+        //response = await models.audios.create(objAudio)
 
-            tipo_archivo_id = response.dataValues.id_tipo_archivo;
-        }else{
-            tipo_archivo_id = validation[0].dataValues.id_tipo_archivo;
-        }
 
-        response = await models.audios.create({
-            "multimedia_id":multimedia_id,
-            "tipo_archivo_id":tipo_archivo_id
-        })
-
-        audio_id = response.dataValues.id_audio;
+        //audio_id = response.dataValues.id_audio;
 
         
-        let selector ={
+        /*let selector ={
             "songs":{
                 "duration":cuerpo.duration,
                 "audio_id":audio_id
@@ -151,13 +155,17 @@ const addAudio = async (cuerpo,modelo) =>{
                 "chapters":cuerpo.chapters,
                 "audio_id":audio_id
             }
-        }
+        }*/
         
-        let json_aux = selector[modelo_name]
+        //let json_aux = selector[modelo_name]
         
-        response = await modelo.create(json_aux)
+        //response = await modelo.create(json_aux)
+
+        console.log(seleccionMedia(modelo,modelo_name,multimedia_id,tipo_archivo_id,cuerpo))
 
         return {"Estatus":"Registro exitoso"};
+
+        // Selecciones de audio
 
     } catch (e) {
         
@@ -177,7 +185,7 @@ const validations = async (modelo,w_params,creationOBJ) => {
     });
 
     if(validation.length == 0){
-        response = await modelo.create(creationOBJ)
+        let response = await modelo.create(creationOBJ)
         selector ={
             "publishers":response.dataValues.id_publisher,
             "creators":response.dataValues.id_creator,
@@ -194,6 +202,126 @@ const validations = async (modelo,w_params,creationOBJ) => {
     }
 
     return id_return;
+}
+
+const seleccionMedia = async (modeloFinal,model_name,multimedia_id,tipo_archivo_id,cuerpo) => {
+    let jsonAudio = {"multimedia_id":multimedia_id,"tipo_archivo_id":tipo_archivo_id}
+    let jsonTexto = {"multimedia_id":multimedia_id,"tipo_archivo_id":tipo_archivo_id,"sheets":cuerpo.sheets,"iscolor":cuerpo.isColor}
+    let jsonVideo = {"multimedia_id":multimedia_id,"tipo_archivo_id":tipo_archivo_id,"main_casting":cuerpo.main_casting,"ranking":cuerpo.ranking}
+    let jsonMedia = {
+        "songs":[
+            models.audios,
+            jsonAudio,
+            
+        ],
+        "podcasts":[
+            models.audios,
+            jsonAudio,
+        ],
+        "audio_books":[
+            models.audios,
+            jsonAudio,
+        ],
+        "mangas":[
+            models.texts,
+            jsonTexto,
+        ],
+        "books":[
+            models.texts,
+            jsonTexto,
+        ],
+        "comics":[
+            models.texts,
+            jsonTexto,
+        ],
+        "movie":[
+            models.videos,
+            jsonVideo,
+        ],
+        "series":[
+            models.videos,
+            jsonVideo,
+        ],
+        "social_videos":[
+            models.videos,
+            jsonVideo,
+        ],
+    };
+
+    
+
+    let objSelector = jsonMedia[model_name]
+
+    let response =  await objSelector[0].create(objSelector[1])
+
+    let jsonID = {
+        "songs":response.dataValues.id_audio,
+        "podcasts":response.dataValues.id_audio,
+        "audio_books":response.dataValues.id_audio,
+        "mangas":response.dataValues.id_text,
+        "books":response.dataValues.id_text,
+        "comics":response.dataValues.id_text,
+        "movie":response.dataValues.id_video,
+        "series":response.dataValues.id_video,
+        "social_videos":response.dataValues.id_video
+    };
+
+    let response_id = jsonID[model_name]
+
+    console.log(response_id)
+
+    let selectorMedia ={
+        "songs":{
+            "duration":cuerpo.duration,
+            "audio_id":response_id
+        },
+        "podcasts":{
+            "duration_p_e":cuerpo.duration_p_e,
+            "noepisodes":cuerpo.noepisodes,
+            "audio_id":response_id
+        },
+        "audio_books":{
+            "duration":cuerpo.duration,
+            "chapters":cuerpo.chapters,
+            "audio_id":response_id
+        },
+        "mangas":{
+            "chapters":cuerpo.chapters,
+            "volumes":cuerpo.volumes,
+            "text_id": response_id
+        },
+        "books":{
+            "chapters":cuerpo.chapters,
+            "imagenes":cuerpo.imagenes,
+            "text_id": response_id
+        },
+        "comics":{
+            "chapters":cuerpo.chapters,
+            "text_id": response_id
+        },
+        "movie":{
+            "duration":cuerpo.duration,
+            "issequel":cuerpo.isSequel,
+            "video_id": response_id
+        },
+        "series":{
+            "duration_p_e":cuerpo.duration_p_e,
+            "noepisodes": cuerpo.noepisodes,
+            "seasons": cuerpo.seasons,
+            "video_id": response_id
+        },
+        "social_videos":{
+            "duration":cuerpo.duration,
+            "social_media": cuerpo.social_media,
+            "video_id": response_id
+        }
+    }
+
+    objSelector = selectorMedia[model_name]
+
+    response = await modeloFinal.create(objSelector)
+    
+    return response;
 }
 
 // getCreators, getPublishers, getTipoArchivo, addCreator, addPublisher, addTipoArchivo, deleteCreator, deletePublisher, deleteTipoArchivo
@@ -344,5 +472,4 @@ export const getAudios = async (req, res) => {
 export const addMovies = async (req, res) => {
     console.log("Add Movies");
     let response;
-
 }

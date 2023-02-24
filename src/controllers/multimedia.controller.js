@@ -3,6 +3,7 @@ import modelosInit from '../models/init-models.js'
 import {Op} from "sequelize";
 let models = modelosInit(sequelize)
 
+// Funcion Get All que obtiene toda la tabla Multimedias
 export const getMultimedia = async (req,res) =>{
     let response;
     try {
@@ -22,6 +23,7 @@ export const getMultimedia = async (req,res) =>{
     res.status(200).json(response);
 }
 
+// Funcion AddMultimedia que permite la insercion de multiples multimedias segun el tipo de cuerpo
 export const addMultimedia = async (req,res) =>{
     
     let cuerpo = req.body;
@@ -89,6 +91,7 @@ export const addMultimedia = async (req,res) =>{
     res.status(200).json(cuerpo);
 }
 
+// Funcion AddAudio que permite procesar las inserciones de Audio de AddMultimedia()
 const addAudio = async (cuerpo,modelo) =>{
     let response;
     let publisher_id;
@@ -126,11 +129,13 @@ const addAudio = async (cuerpo,modelo) =>{
         
         tipo_archivo_id = await validations(models.tipo_archivo,w_tarchivo,w_tarchivo)
 
+
         //aqui empieza creacion de audio
         
         //let objAudio = {"multimedia_id":multimedia_id,"tipo_archivo_id":tipo_archivo_id}
         
         //response = await models.audios.create(objAudio)
+
 
         //audio_id = response.dataValues.id_audio;
 
@@ -168,6 +173,7 @@ const addAudio = async (cuerpo,modelo) =>{
     } 
 };
 
+// Funcion Validations que permite procesar las validaciones de las inserciones
 // modelo -> modelos de la base --- params -> {"name":Natalia,"last_name"Lafourcade}
 const validations = async (modelo,w_params,creationOBJ) => {
 
@@ -316,4 +322,154 @@ const seleccionMedia = async (modeloFinal,model_name,multimedia_id,tipo_archivo_
     response = await modeloFinal.create(objSelector)
     
     return response;
+}
+
+// getCreators, getPublishers, getTipoArchivo, addCreator, addPublisher, addTipoArchivo, deleteCreator, deletePublisher, deleteTipoArchivo
+
+export const getCreators = async (req, res) => {
+    console.log("Get Creators");
+    let response; 
+    try{
+        response = await models.creators.findAll()
+    }
+    catch (e) {
+        res.status(500).json({"Error": e.message});
+    }
+    res.status(200).json(response);
+}
+
+export const getPublishers = async (req, res) => {
+    console.log("Get Publishers");
+    let response; 
+    try{
+        response = await models.publishers.findAll()
+    }
+    catch (e) {
+        res.status(500).json({"Error": e.message});
+    }
+    res.status(200).json(response);
+}
+
+export const getTipoArchivo = async (req, res) => {
+    console.log("Get Tipo Archivo");
+    let response; 
+    try{
+        response = await models.tipo_archivo.findAll()
+    }
+    catch (e) {
+        res.status(500).json({"Error": e.message});
+    }
+    res.status(200).json(response);
+}
+
+export const addCreator = async (req, res) => {
+    console.log("Add Creator");
+    const {name, last_name, age, bio} = req.body;
+    let response;
+    try{
+        response = await models.creators.create({
+            name, 
+            last_name, 
+            age, 
+            bio
+        })
+    } catch (e) {
+        res.status(500).json({"Error": e.message});
+    }
+    res.status(200).json({"Registro Exitoso": response.dataValues})
+}
+
+export const addPublisher = async (req, res) => {
+    console.log("Add Publisher");
+    const {name} = req.body;
+    let response;
+    try{
+        response = await models.publishers.create({
+            name
+        })
+    } catch (e) {
+        res.status(500).json({"Error": e.message});
+    }
+    res.status(200).json({"Registro Exitoso": response.dataValues})
+}
+
+export const addTipoArchivo = async (req, res) => {
+    console.log("Add Tipo Archivo");
+    const {extension} = req.body;
+    let response;
+    try{
+        response = await models.tipo_archivo.create({
+            extension
+        })
+    } catch (e) {
+        res.status(500).json({"Error": e.message});
+    }
+    res.status(200).json({"Registro Exitoso": response.dataValues})
+}
+
+export const deleteCreator = async (req, res) => {
+    console.log("Delete Creator");
+    const {id_creator} = req.params;
+    let response;
+    try {
+        response = await models.creators.destroy({
+            where:{id_creator}
+        })
+    } catch (e) {
+        res.status(500).json({"error": e.message})
+    }
+    res.status(200).json({"Estado:": response})
+}
+
+export const deletePublisher = async (req, res) => {
+    console.log("Delete Publisher");
+    const {id_publisher} = req.params;
+    let response;
+    try {
+        response = await models.publishers.destroy({
+            where:{id_publisher}
+        })
+    } catch (e) {
+        res.status(500).json({"error": e.message})
+    }
+    res.status(200).json({"Estado:": response})
+}
+
+export const deleteTipoArchivo = async (req, res) => {
+    console.log("Delete Tipo Archivo");
+    const {id_tipoarchivo} = req.params;
+    let response;
+    try {
+        response = await models.creators.destroy({
+            where:{id_tipoarchivo}
+        })
+    } catch (e) {
+        res.status(500).json({"error": e.message})
+    }
+    res.status(200).json({"Estado:": response})
+}
+
+export const getAudios = async (req, res) => {
+    console.log("Get Audios");
+    let response; 
+    try{
+        response = await models.audios.findAll({
+            include:[{
+                model: models.songs,
+                as: 'songs'
+            },{
+                model: models.multimedias,
+                as: 'multimedium'
+            }]
+        })
+    }
+    catch (e) {
+        res.status(500).json({"Error": e.message});
+    }
+    res.status(200).json(response);
+}
+
+export const addMovies = async (req, res) => {
+    console.log("Add Movies");
+    let response;
 }

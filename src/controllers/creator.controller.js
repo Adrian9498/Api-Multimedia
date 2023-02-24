@@ -22,21 +22,19 @@ export const addCreator = async (req,res) =>{
         "bio":cuerpo.bio.trim(), 
         "nickname":cuerpo.nickname.trim()
     }
-
-    let response = await models.creators.create(creatorOBJ)
-    console.log(response);
-    if(response.dataValues.id_creator >= 1){
-        res.status(200).json({"message":"Creador registrado."});
-    }
-    else{
-        res.status(304).json({"message":"Error, no fue posible registrar al creador."});
+    try{
+        let response = await models.creators.create(creatorOBJ)
+        if(response.dataValues.id_creator >= 1){
+            res.status(200).json({"message":"Creador registrado."});
+        }
+    } catch (e) {
+        res.status(500).json({"error": e.message})
     }
 }
 
 
 export const editCreator = async (req,res) =>{
     let cuerpo = req.body;
-
     let creatorOBJ = {
         "name":cuerpo.name.trim(), 
         "last_name":cuerpo.last_name.trim(), 
@@ -44,30 +42,30 @@ export const editCreator = async (req,res) =>{
         "bio":cuerpo.bio.trim(), 
         "nickname":cuerpo.nickname.trim()
     }
-
-    let response = await models.creators.update(creatorOBJ, {
-        where: {
-          id_creator: cuerpo.id_creator
-        }
-      })
-    console.log(response);
-    
+    try {
+        let response = await models.creators.update(creatorOBJ, {
+            where: {
+            id_creator: cuerpo.id_creator
+            }
+        })
+    } catch (e) {
+        res.status(500).json({"error": e.message})
+    }
     res.status(200).json({"message":"Creador modificado."});
-
 }
 
 
 
 export const deleteCreator = async (req,res) =>{
     let cuerpo = req.body;
-
-    let response = await models.creators.destroy({
-        where: {
-          id_creator: cuerpo.id_creator
-        }
-    })
-    console.log(cuerpo);
-    
+    try{
+        let response = await models.creators.destroy({
+            where: {
+            id_creator: cuerpo.id_creator
+            }
+        })
+    } catch (e) {
+        res.status(500).json({"error": e.message})
+    }
     res.status(200).json({"message":"Creador eliminado."});
-
 }

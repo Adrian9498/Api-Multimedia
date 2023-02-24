@@ -129,8 +129,8 @@ const addAudio = async (cuerpo,modelo) =>{
         }
 
         response = await models.audios.create({
-           "multimedia_id":multimedia_id,
-           "tipo_archivo_id":tipo_archivo_id
+            "multimedia_id":multimedia_id,
+            "tipo_archivo_id":tipo_archivo_id
         })
 
         audio_id = response.dataValues.id_audio;
@@ -339,4 +339,10 @@ export const getAudios = async (req, res) => {
         res.status(500).json({"Error": e.message});
     }
     res.status(200).json(response);
+}
+
+export const addMovies = async (req, res) => {
+    console.log("Add Movies");
+    let response;
+
 }

@@ -14,9 +14,8 @@ export default class books extends Model {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    sheets: {
-      type: DataTypes.INTEGER,
-      allowNull: false
+    imagenes: {
+      type: DataTypes.BOOLEAN,
     },
     text_id: {
       type: DataTypes.INTEGER,

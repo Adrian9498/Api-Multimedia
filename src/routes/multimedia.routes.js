@@ -2,7 +2,7 @@ import {Router, application} from 'express';
 import {getMultimedia,addMultimedia} from '../controllers/multimedia.controller.js';
 import {getCreators, getPublishers, getTipoArchivo, addCreator, addPublisher, addTipoArchivo, deleteCreator, deletePublisher, deleteTipoArchivo} from '../controllers/multimedia.controller.js';
 import {getAudios} from '../controllers/multimedia.controller.js';
-import {addMovie} from '../controllers/multimedia.controller.js';
+/* import {addMovie} from '../controllers/multimedia.controller.js'; */
 const router = Router();
 
 // Ruta Get All / Obtener Todo
@@ -25,7 +25,7 @@ router.delete('/api/deleteTipoArchivo/:id_tipoarchivo', deleteTipoArchivo)
 
 router.get('/api/audios', getAudios)
 
-router.post('/api/addMovie', addMovie);
+/* router.post('/api/addMovie', addMovie); */
 
 
 router.get('*', (req, res) => {
